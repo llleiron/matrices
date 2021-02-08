@@ -1,4 +1,4 @@
-import numpy as np
+# import numpy as np
 import random
 
 class matrix:
@@ -53,9 +53,25 @@ class matrix:
             result += (']\n')
         return result
     
-    def determinate(self):
-        npDet = np.linalg.det(self.d2_array)
-        return round(npDet, 9)
+
+    def determinant(self, total= 0):
+        indices = list(range(len(self.d2_array)))
+        if len(self.d2_array) == 2 and len(self.d2_array[0]) == 2:
+            val = self.d2_array[0][0] * self.d2_array[1][1] - self.d2_array[1][0] * self.d2_array[0][1]
+            return val
+        
+        for fc in indices:
+            As = matrix.copy_matrix(self.d2_array)
+            As = As[1:]
+            height = len(As)
+
+            for i in range(height):
+                As[i] = As[i][0:fc] + As[i][fc+1:]
+            As = matrix(As)
+            sign = (-1) ** (fc % 2)
+            sub_det = As.determinant()
+            total += sign * self.d2_array[0][fc] * sub_det
+        return total
 
     def inverse(self):
         result = np.linalg.inv(self.d2_array)
@@ -73,8 +89,35 @@ class matrix:
         if len(self.d2_array) == len(self.d2_array[0]):
             return True
         return False
+    
+    @staticmethod
+    def zeros_matrix(rows, cols):
+        M = []
+        while len(M) < rows:
+            M.append([])
+            while len(M[-1]) < cols:
+                M[-1].append(0.0)
+
+        return M
+
+    @staticmethod
+    def copy_matrix(M):
+        rows = len(M)
+        cols = len(M[0])
+
+        MC = matrix.zeros_matrix(rows, cols)
+
+        for i in range(rows):
+            for j in range(cols):
+                MC[i][j] = M[i][j]
+
+        return MC
 
     @staticmethod
     def random_matrix(n, m):
         rand_matrix = matrix([[random.uniform(100, 200) for i in range(n)] for j in range(m)])
         return rand_matrix
+
+if __name__ == '__main__':
+    m = matrix([[6, 1, 1], [4, -2, 5], [2, 8, 7]])
+    print(m.determinant())
